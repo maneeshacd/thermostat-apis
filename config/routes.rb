@@ -4,5 +4,5 @@ Rails.application.routes.draw do
   resources :readings, only: %i[create]
   get '/:reading_id/thermostat_details', to: 'readings#thermostat_details',
                                          as: :thermostat_details
-  get '/thermostats/:household_token', to: 'thermostats#show'
+  post '/thermostat_statistics', to: 'thermostats#statistics'
 end
