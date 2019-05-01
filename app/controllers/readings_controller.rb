@@ -1,5 +1,5 @@
 class ReadingsController < ApplicationController
-  before_action :set_thermostat
+  before_action :set_thermostat, only: :create
 
   def create
     result = StoreThermostatReading.call(
@@ -13,6 +13,19 @@ class ReadingsController < ApplicationController
     else
       raise_bad_request(result.reading)
     end
+  end
+
+  def thermostat_details
+    result = ReadingFromSidekiq.call(
+      reading_id: params[:reading_id], queue: QUEUE
+    )
+    reading =
+      result.success? ? result.reading : Reading.find(params[:reading_id])
+
+    thermostat = Thermostat.find(reading['thermostat_id'])
+    success_response(
+      code: 200, data: { thermostat: thermostat }
+    )
   end
 
   private

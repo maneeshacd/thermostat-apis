@@ -7,4 +7,8 @@ class Thermostat < ApplicationRecord
   def next_sequence_number
     readings.maximum(:number).to_i + 1
   end
+
+  def as_json(*)
+    super.except('created_at', 'updated_at')
+  end
 end
