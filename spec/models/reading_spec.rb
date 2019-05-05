@@ -19,20 +19,23 @@ RSpec.describe Reading, type: :model do
 
     it { should validate_presence_of(:battery_charge) }
     it { should validate_numericality_of(:battery_charge) }
+
+    it { should validate_presence_of(:token) }
+    it { should validate_uniqueness_of(:token) }
   end
 
   describe 'public class methods' do
     context 'responds to its methods' do
-      it { expect(Reading).to respond_to(:next_id) }
+      it { expect(Reading).to respond_to(:set_token) }
     end
 
     context 'executes methods correctly' do
-      context 'next_id' do
+      context 'set_token' do
         let!(:thermostat) { create(:thermostat) }
         let!(:reading) { create(:reading, thermostat: thermostat) }
 
-        it 'gives next primary_key id for a reading' do
-          expect(Reading.next_id).to eq(reading.id + 1)
+        it 'gives uniq token' do
+          expect(Reading.set_token).not_to eq(reading.token)
         end
       end
     end

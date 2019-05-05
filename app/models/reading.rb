@@ -5,9 +5,13 @@ class Reading < ApplicationRecord
   validates :temperature, presence: true, numericality: true
   validates :humidity, presence: true, numericality: true
   validates :battery_charge, presence: true, numericality: true
+  validates :token, presence: true, uniqueness: true
 
-  def self.next_id
-    maximum(:id).to_i + 1
+  def self.set_token
+    loop do
+      token = SecureRandom.hex(10)
+      break token unless Reading.where(token: token).exists?
+    end
   end
 
   def as_json(*)

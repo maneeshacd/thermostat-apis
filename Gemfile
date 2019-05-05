@@ -6,6 +6,7 @@ ruby '2.6.3'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'figaro'
 gem 'interactor', '~> 3.0'
+gem 'jsonapi-rails'
 gem 'pg'
 gem 'puma', '~> 3.11'
 gem 'rails', '~> 5.2.3'

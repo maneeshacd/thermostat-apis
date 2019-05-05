@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ReadingFromSidekiq, type: :interactor do
   subject(:result) do
     ReadingFromSidekiq.call(
-      reading_id: reading_params[:id].to_s,
+      token: reading_params[:token].to_s,
       queue: 'testing'
     )
   end
@@ -14,7 +14,7 @@ RSpec.describe ReadingFromSidekiq, type: :interactor do
       attributes_for(:reading, thermostat_id: thermostat.id)
     end
 
-    context 'when given reading_id present in sidekiq' do
+    context 'when given token present in sidekiq' do
       let!(:sidekiq_job) do
         StoreReadingWorker.set(queue: :testing).perform_async(reading_params)
       end
@@ -29,7 +29,7 @@ RSpec.describe ReadingFromSidekiq, type: :interactor do
       end
     end
 
-    context 'when given reading_id not present in sidekiq' do
+    context 'when given token not present in sidekiq' do
       it 'fails' do
         expect(result).to be_a_failure
       end

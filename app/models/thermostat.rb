@@ -5,7 +5,11 @@ class Thermostat < ApplicationRecord
   validates :address, presence: true
 
   def next_sequence_number
-    readings.maximum(:number).to_i + 1
+    [
+      readings.maximum(:number).to_i,
+      ReadingsFromSidekiq.call(queue: QUEUE, thermostat_id: id)
+                         .readings.pluck('number').max.to_i
+    ].max + 1
   end
 
   def as_json(*)
@@ -15,11 +19,8 @@ class Thermostat < ApplicationRecord
   def reading_statistics(sidekiq_readings)
     statistics = {}
     %i[temperature humidity battery_charge].each do |col|
-      col_values =
-        (
-          readings.as_json +
-          sidekiq_readings.find_all { |r| r['thermostat_id'] == id }
-        ).uniq { |e| e['id'] }.map { |e| e[col.to_s] }.map(&:to_f)
+      col_values = (readings.as_json + sidekiq_readings)
+                   .uniq { |e| e['id'] }.map { |e| e[col.to_s] }.map(&:to_f)
 
       statistics[col] = {
         min: col_values.min,

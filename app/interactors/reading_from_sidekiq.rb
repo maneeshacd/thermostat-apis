@@ -4,7 +4,7 @@ class ReadingFromSidekiq
   def call
     queued_items =
       Sidekiq::Queue.new(context.queue).map(&:item).pluck('args').flatten
-    reading = queued_items.find { |item| item['id'].to_s == context.reading_id }
+    reading = queued_items.find { |item| item['token'] == context.token }
 
     if reading.present?
       context.reading = reading

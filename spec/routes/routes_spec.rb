@@ -7,10 +7,10 @@ RSpec.describe 'routes for thermostat app', type: :routing do
         .to route_to(controller: 'readings', action: 'create')
     end
 
-    it 'routes to /{reading_id}/thermostat_details' do
+    it 'routes to /{token}/thermostat_details' do
       expect(get: '/1/thermostat_details')
         .to route_to(
-          controller: 'readings', action: 'thermostat_details', reading_id: '1'
+          controller: 'readings', action: 'thermostat_details', token: '1'
         )
     end
   end

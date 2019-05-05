@@ -17,15 +17,15 @@ class ReadingsController < ApplicationController
 
   def thermostat_details
     result = ReadingFromSidekiq.call(
-      reading_id: params[:reading_id], queue: QUEUE
+      token: params[:token], queue: QUEUE
     )
-    reading =
-      result.success? ? result.reading : Reading.find(params[:reading_id])
-
+    reading = if result.success?
+                result.reading
+              else
+                Reading.find_by!(token: params[:token])
+              end
     thermostat = Thermostat.find(reading['thermostat_id'])
-    success_response(
-      code: 200, data: { thermostat: thermostat }
-    )
+    success_response(code: 200, data: { thermostat: thermostat })
   end
 
   private

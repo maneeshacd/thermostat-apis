@@ -29,7 +29,8 @@ RSpec.describe StoreThermostatReading, type: :interactor do
       end
 
       it 'provides the reading' do
-        expect(result.reading.attributes).to eql(reading.attributes)
+        expect(result.reading.attributes.except!('token'))
+          .to eql(reading.attributes.except!('token'))
       end
 
       it "provides the reading's sequence number" do

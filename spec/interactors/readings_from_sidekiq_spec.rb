@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ReadingsFromSidekiq, type: :interactor do
   subject(:result) do
-    ReadingsFromSidekiq.call(queue: 'testing')
+    ReadingsFromSidekiq.call(queue: 'testing', thermostat_id: thermostat.id)
   end
 
   describe '.call' do

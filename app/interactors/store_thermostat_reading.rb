@@ -2,6 +2,8 @@ class StoreThermostatReading
   include Interactor
 
   def call
+    @token = Reading.set_token
+
     reading = Reading.new(build_params)
     if reading.valid?
       StoreReadingWorker.perform_async(build_params.to_h)
@@ -16,10 +18,9 @@ class StoreThermostatReading
   def build_params
     thermostat = context.thermostat
     number = thermostat.next_sequence_number
-    id = Reading.next_id
 
     context.params.merge(
-      id: id, number: number, thermostat_id: thermostat.id
+      number: number, thermostat_id: thermostat.id, token: @token
     )
   end
 end

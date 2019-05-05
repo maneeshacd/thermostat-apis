@@ -106,7 +106,7 @@ RSpec.describe ReadingsController, type: :controller do
     before do
       stub_const('QUEUE', 'testing')
       expect(ReadingFromSidekiq).to receive(:call)
-        .once.with(reading_id: reading_params['id'].to_s, queue: QUEUE)
+        .once.with(token: reading_params['token'].to_s, queue: QUEUE)
         .and_return(result)
     end
 
@@ -122,7 +122,7 @@ RSpec.describe ReadingsController, type: :controller do
       it 'returns success json response' do
         resp =
           get :thermostat_details,
-              params: { reading_id: reading_params['id'] }, format: :json
+              params: { token: reading_params['token'] }, format: :json
 
         expect(resp).to have_http_status(:ok)
         expect(JSON.parse(resp.body)).to include_json(
@@ -140,11 +140,11 @@ RSpec.describe ReadingsController, type: :controller do
         double(:result, success?: false, reading: {})
       end
 
-      context 'when reading_id is not valid' do
+      context 'when token is not valid' do
         it 'returns object not found error as json response' do
           resp =
             get :thermostat_details,
-                params: { reading_id: reading_params['id'] }, format: :json
+                params: { token: reading_params['token'] }, format: :json
 
           expect(resp).to have_http_status(:ok)
           expect(JSON.parse(resp.body)).to include_json(

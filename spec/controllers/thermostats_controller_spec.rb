@@ -11,7 +11,7 @@ RSpec.describe ThermostatsController, type: :controller do
     before do
       stub_const('QUEUE', 'testing')
       allow(ReadingsFromSidekiq).to receive(:call)
-        .once.with(queue: QUEUE).and_return(result)
+        .once.with(queue: QUEUE, thermostat_id: thermostat.id).and_return(result)
     end
 
     context 'when successful' do

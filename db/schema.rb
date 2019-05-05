@@ -21,9 +21,11 @@ ActiveRecord::Schema.define(version: 2019_04_30_172533) do
     t.float "temperature", null: false
     t.float "humidity", null: false
     t.float "battery_charge", null: false
+    t.string "token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["thermostat_id"], name: "index_readings_on_thermostat_id"
+    t.index ["token"], name: "index_readings_on_token", unique: true
   end
 
   create_table "thermostats", force: :cascade do |t|
