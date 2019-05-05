@@ -1,4 +1,17 @@
 class ThermostatsController < ApplicationController
+  def show
+    @thermostat = Thermostat.find_by!(household_token: params[:id])
+    result = FetchThermostatReadingFromQueue.call(
+      token: params[:reading_id], queue: QUEUE
+    )
+    reading = if result.success?
+                result.reading
+              else
+                Reading.find_by!(token: params[:reading_id])
+              end
+    success_response(code: 200, data: { thermostat: @thermostat })
+  end
+
   def statistics
     @thermostat = Thermostat.find_by!(household_token: params[:household_token])
     success_response(

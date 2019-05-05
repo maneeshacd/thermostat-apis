@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
-  resources :readings, only: %i[create]
-  get '/:token/thermostat_details', to: 'readings#thermostat_details',
-                                    as: :thermostat_details
-  post '/thermostat_statistics', to: 'thermostats#statistics'
+  resources :readings, only: %i[create] do
+    resources :thermostats, only: :show
+  end
+  resources :statistics, only: :show
 end

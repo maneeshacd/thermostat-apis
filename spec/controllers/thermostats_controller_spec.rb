@@ -7,81 +7,56 @@ RSpec.describe ThermostatsController, type: :controller do
     )
   end
 
-  describe '#statistics' do
+  describe '#show' do
     before do
       stub_const('QUEUE', 'testing')
-
-      allow(FetchReadingsOfASingleThermostatFromQueue).to receive(:call)
-        .once.with(queue: QUEUE, thermostat_id: thermostat.id)
-        .and_return(readings_result)
-
-      allow(GetReadingStatistics).to receive(:call)
-        .once.with(
-          readings_from_queue: readings_result.readings,
-          thermostat: thermostat
-        ).and_return({})
+      expect(FetchThermostatReadingFromQueue).to receive(:call)
+        .once.with(token: reading_params['token'].to_s, queue: QUEUE)
+        .and_return(result)
     end
 
     context 'when successful' do
       let(:thermostat) { create(:thermostat) }
-      let!(:reading) { create(:reading, thermostat: thermostat) }
-
-      context 'when readings present in queue' do
-        let(:readings_from_queue) do
-          [{
-            id: 2, thermostat_id: thermostat.id, number: 2,
-            temperature: 10.00, humidity: 20.00, battery_charge: 30.00
-          }].as_json
-        end
-        let(:readings_result) do
-          double(
-            :readings_result, success?: true, readings: readings_from_queue
-          )
-        end
-        it 'returns success json response' do
-          resp = post :statistics,
-                      params: { household_token: thermostat.household_token },
-                      format: :json
-
-          expect(resp).to have_http_status(:ok)
-          expect(JSON.parse(resp.body)).to include_json(
-            status: 'success',
-            code: 200
-          )
-        end
+      let(:reading_params) do
+        attributes_for(:reading, thermostat_id: thermostat.id).as_json
+      end
+      let(:result) do
+        double(:result, success?: true, reading: reading_params)
       end
 
-      context 'when queue readings empty' do
-        let(:readings_result) do
-          double(:readings_result, success?: false, readings: [])
-        end
+      it 'returns success json response' do
+        resp =
+          get :show,
+              params: {
+                reading_id: reading_params['token'],
+                id: thermostat.household_token
+              }, format: :json
 
-        it 'returns success json response ' do
-          resp = post :statistics,
-                      params: { household_token: thermostat.household_token },
-                      format: :json
-
-          expect(resp).to have_http_status(:ok)
-          expect(JSON.parse(resp.body)).to include_json(
-            status: 'success',
-            code: 200
-          )
-        end
+        expect(resp).to have_http_status(:ok)
+        expect(JSON.parse(resp.body)).to include_json(
+          status: 'success',
+          code: 200,
+          data: { thermostat: thermostat.as_json },
+          message: 'Success'
+        )
       end
     end
 
     context 'when unsuccessful' do
       let(:thermostat) { create(:thermostat) }
-      let!(:reading) { create(:reading, thermostat: thermostat) }
-      let(:readings_result) do
-        double(:readings_result, success?: false, readings: [])
+      let(:reading_params) { attributes_for(:reading).as_json }
+      let(:result) do
+        double(:result, success?: false, reading: {})
       end
 
-      context 'invalid household_token' do
+      context 'when token is not valid' do
         it 'returns object not found error as json response' do
           resp =
-            post :statistics,
-                 params: { household_token: '' }, format: :json
+            get :show,
+                params: {
+                  reading_id: reading_params['token'],
+                  id: thermostat.household_token
+                }, format: :json
 
           expect(resp).to have_http_status(:ok)
           expect(JSON.parse(resp.body)).to include_json(

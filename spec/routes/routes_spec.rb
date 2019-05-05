@@ -6,19 +6,25 @@ RSpec.describe 'routes for thermostat app', type: :routing do
       expect(post: '/readings')
         .to route_to(controller: 'readings', action: 'create')
     end
-
-    it 'routes to /{token}/thermostat_details' do
-      expect(get: '/1/thermostat_details')
-        .to route_to(
-          controller: 'readings', action: 'thermostat_details', token: '1'
-        )
-    end
   end
 
   describe 'Thermostat' do
-    it 'routes to /thermostat_statistics' do
-      expect(post: '/thermostat_statistics')
-        .to route_to(controller: 'thermostats', action: 'statistics')
+    it 'routes to /readings/{reading_id}/thermostat/{id}' do
+      expect(
+        get: '/readings/4ef1b6ecf0ee1ecafcad/thermostats/pypNs7Zxf1onDDDzVmQf'
+      ).to route_to(
+        controller: 'thermostats', action: 'show',
+        reading_id: '4ef1b6ecf0ee1ecafcad', id: 'pypNs7Zxf1onDDDzVmQf'
+      )
+    end
+  end
+
+  describe 'Statistics' do
+    it 'routes to /statistics/{id}' do
+      expect(get: '/statistics/pypNs7Zxf1onDDDzVmQf')
+        .to route_to(
+          controller: 'statistics', action: 'show', id: 'pypNs7Zxf1onDDDzVmQf'
+        )
     end
   end
 end

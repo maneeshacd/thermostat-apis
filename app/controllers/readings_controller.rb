@@ -7,25 +7,10 @@ class ReadingsController < ApplicationController
     )
 
     if result.success?
-      success_response(
-        code: 201, data: { reading: result.reading }
-      )
+      success_response(code: 201, data: { reading: result.reading })
     else
       raise_bad_request(result.reading)
     end
-  end
-
-  def thermostat_details
-    result = FetchThermostatReadingFromQueue.call(
-      token: params[:token], queue: QUEUE
-    )
-    reading = if result.success?
-                result.reading
-              else
-                Reading.find_by!(token: params[:token])
-              end
-    thermostat = Thermostat.find(reading['thermostat_id'])
-    success_response(code: 200, data: { thermostat: thermostat })
   end
 
   private

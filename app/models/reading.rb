@@ -15,6 +15,6 @@ class Reading < ApplicationRecord
   end
 
   def as_json(*)
-    super.except('created_at', 'updated_at')
+    super.except('id', 'created_at', 'updated_at')
   end
 end
