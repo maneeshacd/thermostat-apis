@@ -10,25 +10,34 @@ RSpec.describe ThermostatsController, type: :controller do
   describe '#statistics' do
     before do
       stub_const('QUEUE', 'testing')
+
       allow(FetchReadingsOfASingleThermostatFromQueue).to receive(:call)
-        .once.with(queue: QUEUE, thermostat_id: thermostat.id).and_return(result)
+        .once.with(queue: QUEUE, thermostat_id: thermostat.id)
+        .and_return(readings_result)
+
+      allow(GetReadingStatistics).to receive(:call)
+        .once.with(
+          readings_from_queue: readings_result.readings,
+          thermostat: thermostat
+        ).and_return({})
     end
 
     context 'when successful' do
       let(:thermostat) { create(:thermostat) }
       let!(:reading) { create(:reading, thermostat: thermostat) }
 
-      context 'when sidekiq readings present' do
-        let(:readings_from_sidekiq) do
+      context 'when readings present in queue' do
+        let(:readings_from_queue) do
           [{
             id: 2, thermostat_id: thermostat.id, number: 2,
             temperature: 10.00, humidity: 20.00, battery_charge: 30.00
           }].as_json
         end
-        let(:result) do
-          double(:result, success?: true, readings: readings_from_sidekiq)
+        let(:readings_result) do
+          double(
+            :readings_result, success?: true, readings: readings_from_queue
+          )
         end
-
         it 'returns success json response' do
           resp = post :statistics,
                       params: { household_token: thermostat.household_token },
@@ -42,9 +51,9 @@ RSpec.describe ThermostatsController, type: :controller do
         end
       end
 
-      context 'when sidekiq readings empty' do
-        let(:result) do
-          double(:result, success?: false, readings: [])
+      context 'when queue readings empty' do
+        let(:readings_result) do
+          double(:readings_result, success?: false, readings: [])
         end
 
         it 'returns success json response ' do
@@ -64,8 +73,8 @@ RSpec.describe ThermostatsController, type: :controller do
     context 'when unsuccessful' do
       let(:thermostat) { create(:thermostat) }
       let!(:reading) { create(:reading, thermostat: thermostat) }
-      let(:result) do
-        double(:result, success?: false, readings: [])
+      let(:readings_result) do
+        double(:readings_result, success?: false, readings: [])
       end
 
       context 'invalid household_token' do

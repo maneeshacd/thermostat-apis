@@ -14,7 +14,7 @@ RSpec.describe FetchThermostatReadingFromQueue, type: :interactor do
       attributes_for(:reading, thermostat_id: thermostat.id)
     end
 
-    context 'when given token present in sidekiq' do
+    context 'when given token present in queue' do
       let!(:sidekiq_job) do
         StoreReadingWorker.set(queue: :testing).perform_async(reading_params)
       end
@@ -23,13 +23,13 @@ RSpec.describe FetchThermostatReadingFromQueue, type: :interactor do
         expect(result).to be_a_success
       end
 
-      it 'provides the reading in sidekiq' do
+      it 'provides the reading in queue' do
         expect(result.reading).to eql(reading_params.as_json)
         Sidekiq::Queue.new('testing').clear
       end
     end
 
-    context 'when given token not present in sidekiq' do
+    context 'when given token not present in queue' do
       it 'fails' do
         expect(result).to be_a_failure
       end
