@@ -30,8 +30,8 @@
 | Url | Description | Arguments | Return |
 | ------ | ------ | ------ | ------ |
 | POST /readings | Stores temperature, humidity and battery charge from a particular thermostat. | household_token, temperature, humidity, battery_charge | Reading data |
-| GET /:reading_id/thermostat_details | Returns the thermostat data using the reading_id obtained from POST Reading. | reading_id | Thermostat data |
-| GET /thermostat_statistics | Gives the average, minimum and maximum by temperature, humidity and battery_charge in a particular thermostat across all the period of time. | household_token | Thermostat statistics |
+| GET /readings/:reading_id/thermostats/:id | Returns the thermostat data using the token as reading_id obtained from POST Reading and household_token as id. | reading_id - token, id - household_token | Thermostat data |
+| GET /statistics/:id | Gives the average, minimum and maximum by temperature, humidity and battery_charge in a particular thermostat across all the period of time. | id - household_token | Thermostat statistics |
 
 ## Get started
 
@@ -95,19 +95,19 @@ bundle exec rspec spec
         "code": 201,
         "data": {
             "reading": {
-                "id": 16,
-                "thermostat_id": 2,
-                "number": 15,
-                "temperature": 10,
+                "thermostat_id": 1,
+                "number": 5,
+                "temperature": 9,
                 "humidity": 10,
-                "battery_charge": 30
+                "battery_charge": 30,
+                "token": "dc34807b78a144e5c551"
             }
         },
         "message": "Success"
     }
   ```
   
-#### GET /14/thermostat_details
+#### GET /readings/4ef1b6ecf0ee1ecafcad/thermostats/pypNs7Zxf1onDDDzVmQf
   ##### Request
   ```sh
     body {}
@@ -115,26 +115,23 @@ bundle exec rspec spec
   ##### Response
   ```sh
     {
-      "status": "success",
-      "code": 200,
-      "data": {
-          "thermostat": {
-              "id": 2,
-              "household_token": "FG4Pz7DMPQI5i5JT874O",
-              "address": "Hohenzollernring 56, 48145 Münster, Germany"
-          }
-      },
-      "message": "Success"
+        "status": "success",
+        "code": 200,
+        "data": {
+            "thermostat": {
+                "id": 1,
+                "household_token": "pypNs7Zxf1onDDDzVmQf",
+                "address": "Europa-Allee 50; 60327 Frankfurt am Main, Germany"
+            }
+        },
+        "message": "Success"
     }
   ```
   
-#### POST /thermostat_statistics
+#### GET /statistics/pypNs7Zxf1onDDDzVmQf
   ##### Request
   ```sh
-    body
-      {
-        "household_token": "FG4Pz7DMPQI5i5JT874O"
-      }
+    body {}
   ```
   ##### Response
   ```sh
@@ -144,14 +141,14 @@ bundle exec rspec spec
         "data": {
             "statistics": {
                 "temperature": {
-                    "min": 10.08,
-                    "avg": 10.08,
-                    "max": 10.08
+                    "min": 9,
+                    "avg": 9.67,
+                    "max": 10
                 },
                 "humidity": {
                     "min": 10,
-                    "avg": 11.33,
-                    "max": 20
+                    "avg": 10,
+                    "max": 10
                 },
                 "battery_charge": {
                     "min": 30,
@@ -160,9 +157,9 @@ bundle exec rspec spec
                 }
             },
             "thermostat": {
-                "id": 2,
-                "household_token": "FG4Pz7DMPQI5i5JT874O",
-                "address": "Hohenzollernring 56, 48145 Münster, Germany"
+                "id": 1,
+                "household_token": "pypNs7Zxf1onDDDzVmQf",
+                "address": "Europa-Allee 50; 60327 Frankfurt am Main, Germany"
             }
         },
         "message": "Success"
