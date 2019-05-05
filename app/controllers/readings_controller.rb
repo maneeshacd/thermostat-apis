@@ -16,7 +16,7 @@ class ReadingsController < ApplicationController
   end
 
   def thermostat_details
-    result = ReadingFromSidekiq.call(
+    result = FetchThermostatReadingFromQueue.call(
       token: params[:token], queue: QUEUE
     )
     reading = if result.success?

@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe ReadingsFromSidekiq, type: :interactor do
+RSpec.describe FetchReadingsOfASingleThermostatFromQueue, type: :interactor do
   subject(:result) do
-    ReadingsFromSidekiq.call(queue: 'testing', thermostat_id: thermostat.id)
+    FetchReadingsOfASingleThermostatFromQueue.call(queue: 'testing', thermostat_id: thermostat.id)
   end
 
   describe '.call' do

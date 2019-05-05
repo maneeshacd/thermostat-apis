@@ -1,8 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe ReadingFromSidekiq, type: :interactor do
+RSpec.describe FetchThermostatReadingFromQueue, type: :interactor do
   subject(:result) do
-    ReadingFromSidekiq.call(
+    FetchThermostatReadingFromQueue.call(
       token: reading_params[:token].to_s,
       queue: 'testing'
     )

@@ -10,7 +10,7 @@ RSpec.describe ThermostatsController, type: :controller do
   describe '#statistics' do
     before do
       stub_const('QUEUE', 'testing')
-      allow(ReadingsFromSidekiq).to receive(:call)
+      allow(FetchReadingsOfASingleThermostatFromQueue).to receive(:call)
         .once.with(queue: QUEUE, thermostat_id: thermostat.id).and_return(result)
     end
 

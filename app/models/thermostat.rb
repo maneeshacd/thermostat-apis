@@ -7,7 +7,7 @@ class Thermostat < ApplicationRecord
   def next_sequence_number
     [
       readings.maximum(:number).to_i,
-      ReadingsFromSidekiq.call(queue: QUEUE, thermostat_id: id)
+      FetchReadingsOfASingleThermostatFromQueue.call(queue: QUEUE, thermostat_id: id)
                          .readings.pluck('number').max.to_i
     ].max + 1
   end

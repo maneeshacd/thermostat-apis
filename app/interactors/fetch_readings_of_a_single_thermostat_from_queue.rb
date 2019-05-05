@@ -1,4 +1,4 @@
-class ReadingsFromSidekiq
+class FetchReadingsOfASingleThermostatFromQueue
   include Interactor
 
   def call

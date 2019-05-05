@@ -105,7 +105,7 @@ RSpec.describe ReadingsController, type: :controller do
   describe '#thermostat_details' do
     before do
       stub_const('QUEUE', 'testing')
-      expect(ReadingFromSidekiq).to receive(:call)
+      expect(FetchThermostatReadingFromQueue).to receive(:call)
         .once.with(token: reading_params['token'].to_s, queue: QUEUE)
         .and_return(result)
     end
