@@ -30,7 +30,7 @@ RSpec.describe GetReadingStatistics, type: :interactor do
       end
 
       it 'provides a empty reading object' do
-        expect(result.values).to be_empty
+        expect(result.statistics).to be_empty
       end
     end
   end

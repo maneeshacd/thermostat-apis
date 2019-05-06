@@ -7,10 +7,24 @@ class ReadingsController < ApplicationController
     )
 
     if result.success?
-      success_response(code: 201, data: { reading: result.reading })
+      render json: ReadingSerializer.new(result.reading)
     else
       raise_bad_request(result.reading)
     end
+  end
+
+  def show
+    result = FetchThermostatReadingFromQueue.call(
+      token: params[:id], queue: QUEUE
+    )
+    reading = if result.success?
+                result.reading
+              else
+                Reading.find_by!(token: params[:id])
+              end
+    render json: ReadingSerializer.new(
+      Reading.new(reading.as_json), include: [:thermostat]
+    )
   end
 
   private

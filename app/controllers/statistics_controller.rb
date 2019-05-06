@@ -1,9 +1,9 @@
 class StatisticsController < ApplicationController
   def show
     @thermostat = Thermostat.find_by!(household_token: params[:id])
-    success_response(
-      data: { statistics: statistics.values, thermostat: @thermostat }
-    )
+    @statistics =
+      Statistics.new(statistics: statistics.statistics, thermostat: @thermostat)
+    render json: StatisticsSerializer.new(@statistics)
   end
 
   private

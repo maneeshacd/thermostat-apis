@@ -40,21 +40,4 @@ RSpec.describe Reading, type: :model do
       end
     end
   end
-
-  describe 'public instance methods' do
-    context 'responds to its methods' do
-      it { expect(Reading.new).to respond_to(:as_json) }
-    end
-
-    context 'executes methods correctly' do
-      context 'as_json' do
-        let!(:thermostat) { build(:thermostat) }
-        let!(:reading) { build(:reading, thermostat: thermostat) }
-
-        it 'returns reading object hash excluding created_at and updated_at' do
-          expect(reading.as_json).not_to include(:created_at, :updated_at)
-        end
-      end
-    end
-  end
 end

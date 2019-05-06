@@ -12,8 +12,4 @@ class Thermostat < ApplicationRecord
       ).readings.pluck('number').max.to_i
     ].max + 1
   end
-
-  def as_json(*)
-    super.except('created_at', 'updated_at')
-  end
 end

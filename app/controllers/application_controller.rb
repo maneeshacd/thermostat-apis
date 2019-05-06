@@ -15,23 +15,17 @@ class ApplicationController < ActionController::API
   end
 
   def raise_unauthorized
-    render json: { status: 'Unauthorized', code: 401, data: nil,
-                   message: 'Unauthorized' }
+    error = Error.new(code: 401, message: 'Unauthorized')
+    render json: ErrorSerializer.new(error)
   end
 
   def record_not_found
-    render json: { status: 'Bad Request', code: 404, data: nil,
-                   message: 'Object Not Found' }
+    error = Error.new(code: 404, message: 'Object Not Found')
+    render json: ErrorSerializer.new(error)
   end
 
   def raise_bad_request(obj)
-    render json: { status: 'Bad Request', code: 400, data: nil,
-                   message: obj.errors.full_messages }
-  end
-
-  def success_response(code: 200, data: nil)
-    render json: {
-      status: 'success', code: code, data: data, message: 'Success'
-    }
+    error = Error.new(code: 400, message: obj.errors.full_messages)
+    render json: ErrorSerializer.new(error)
   end
 end

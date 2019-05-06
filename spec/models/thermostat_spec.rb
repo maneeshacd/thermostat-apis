@@ -28,15 +28,6 @@ RSpec.describe Thermostat, type: :model do
           expect(thermostat.next_sequence_number).to eq(2)
         end
       end
-
-      context 'as_json' do
-        let!(:thermostat) { build(:thermostat) }
-
-        it 'returns thermostat object hash excluding
-            created_at and updated_at' do
-          expect(thermostat.as_json).not_to include(:created_at, :updated_at)
-        end
-      end
     end
   end
 end

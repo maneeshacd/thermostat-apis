@@ -13,8 +13,4 @@ class Reading < ApplicationRecord
       break token unless Reading.where(token: token).exists?
     end
   end
-
-  def as_json(*)
-    super.except('id', 'created_at', 'updated_at')
-  end
 end

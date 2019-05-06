@@ -8,9 +8,9 @@ class GetReadingStatistics
       statistics[col] = statistics_of(col)
     end
     if @total_readings.present?
-      context.values = statistics
+      context.statistics = statistics
     else
-      context.fail!(values: {})
+      context.fail!(statistics: {})
     end
   end
 

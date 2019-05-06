@@ -4,6 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.6.3'
 
 gem 'bootsnap', '>= 1.1.0', require: false
+gem 'fast_jsonapi'
 gem 'figaro'
 gem 'interactor', '~> 3.0'
 gem 'jsonapi-rails'

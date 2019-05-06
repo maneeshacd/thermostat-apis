@@ -8,6 +8,19 @@ RSpec.describe StatisticsController, type: :controller do
   end
 
   describe '#show' do
+    let(:final_statistics) do
+      {
+        temperature: { min: 9, avg: 9, max: 9 },
+        humidity: { min: 10, avg: 10, max: 10 },
+        battery_charge: { min: 30, avg: 30, max: 30 }
+      }
+    end
+    let(:statistics_result) do
+      double(
+        :statistics_result, success?: true, statistics: final_statistics
+      )
+    end
+
     before do
       stub_const('QUEUE', 'testing')
 
@@ -19,7 +32,7 @@ RSpec.describe StatisticsController, type: :controller do
         .once.with(
           readings_from_queue: readings_result.readings,
           thermostat: thermostat
-        ).and_return({})
+        ).and_return(statistics_result)
     end
 
     context 'when successful' do
@@ -38,16 +51,23 @@ RSpec.describe StatisticsController, type: :controller do
             :readings_result, success?: true, readings: readings_from_queue
           )
         end
+
         it 'returns success json response' do
           resp = get :show,
-                      params: { id: thermostat.household_token },
-                      format: :json
+                     params: { id: thermostat.household_token },
+                     format: :json
 
           expect(resp).to have_http_status(:ok)
-          expect(JSON.parse(resp.body)).to include_json(
-            status: 'success',
-            code: 200
-          )
+          expect(JSON.parse(resp.body)).to include_json(data: {})
+          expect(JSON.parse(resp.body)['data'])
+            .to include_json(type: 'statistics', attributes: {})
+          expect(JSON.parse(resp.body)['data']['attributes'])
+            .to eq(
+              'statistics' => final_statistics.as_json,
+              'thermostat' => thermostat.attributes.except(
+                'created_at', 'updated_at'
+              )
+            )
         end
       end
 
@@ -58,14 +78,20 @@ RSpec.describe StatisticsController, type: :controller do
 
         it 'returns success json response ' do
           resp = get :show,
-                      params: { id: thermostat.household_token },
-                      format: :json
+                     params: { id: thermostat.household_token },
+                     format: :json
 
           expect(resp).to have_http_status(:ok)
-          expect(JSON.parse(resp.body)).to include_json(
-            status: 'success',
-            code: 200
-          )
+          expect(JSON.parse(resp.body)).to include_json(data: {})
+          expect(JSON.parse(resp.body)['data'])
+            .to include_json(type: 'statistics', attributes: {})
+          expect(JSON.parse(resp.body)['data']['attributes'])
+            .to eq(
+              'statistics' => final_statistics.as_json,
+              'thermostat' => thermostat.attributes.except(
+                'created_at', 'updated_at'
+              )
+            )
         end
       end
     end
@@ -84,10 +110,12 @@ RSpec.describe StatisticsController, type: :controller do
                  params: { id: 0 }, format: :json
 
           expect(resp).to have_http_status(:ok)
-          expect(JSON.parse(resp.body)).to include_json(
-            status: 'Bad Request',
-            code: 404, data: nil,
-            message: 'Object Not Found'
+          expect(JSON.parse(resp.body)).to include_json(data: {})
+          expect(JSON.parse(resp.body)['data']).to include_json(
+            type: 'error', attributes: {}
+          )
+          expect(JSON.parse(resp.body)['data']['attributes']).to eq(
+            { code: 404, message: 'Object Not Found' }.as_json
           )
         end
       end
