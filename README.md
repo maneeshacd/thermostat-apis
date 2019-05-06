@@ -30,7 +30,7 @@
 | Url | Description | Arguments | Return |
 | ------ | ------ | ------ | ------ |
 | POST /readings | Stores temperature, humidity and battery charge from a particular thermostat. | household_token, temperature, humidity, battery_charge | Reading data |
-| GET /readings/:reading_id/thermostats/:id | Returns the thermostat data using the token as reading_id obtained from POST Reading and household_token as id. | reading_id - token, id - household_token | Thermostat data |
+| GET /readings/:id | Returns the thermostat and reading data using the token as reading_id obtained from POST Reading and household_token as id. | id - token | Reading and Thermostat data |
 | GET /statistics/:id | Gives the average, minimum and maximum by temperature, humidity and battery_charge in a particular thermostat across all the period of time. | id - household_token | Thermostat statistics |
 
 ## Get started
@@ -45,12 +45,6 @@ rails db:seed
 
 ```sh
 rails s
-```
-
-### start sidekiq
-
-```sh
-bundle exec sidekiq
 ```
 
 ### start sidekiq
@@ -81,33 +75,40 @@ bundle exec rspec spec
   ```sh
     body
       {
-        "household_token": "FG4Pz7DMPQI5i5JT874O",
-        "temperature": 10.00,
-        "humidity": 10.00,
-        "battery_charge": 30.00
+        "household_token": "pypNs7Zxf1onDDDzVmQf",
+        "temperature": 9,
+        "humidity": 10,
+        "battery_charge": 30
 
       }
   ```
   ##### Response
   ```sh
     {
-        "status": "success",
-        "code": 201,
         "data": {
-            "reading": {
-                "thermostat_id": 1,
-                "number": 5,
+            "id": null,
+            "type": "reading",
+            "attributes": {
+                "number": 3,
+                "token": "3808d1a47e90e18de267",
                 "temperature": 9,
-                "humidity": 10,
+                "humidity": 1090,
                 "battery_charge": 30,
-                "token": "dc34807b78a144e5c551"
+                "thermostat_id": 1
+            },
+            "relationships": {
+                "thermostat": {
+                    "data": {
+                        "id": "1",
+                        "type": "thermostat"
+                    }
+                }
             }
-        },
-        "message": "Success"
+        }
     }
   ```
-  
-#### GET /readings/4ef1b6ecf0ee1ecafcad/thermostats/pypNs7Zxf1onDDDzVmQf
+
+#### GET /readings/1aceb8075d4e84f9de37
   ##### Request
   ```sh
     body {}
@@ -115,19 +116,39 @@ bundle exec rspec spec
   ##### Response
   ```sh
     {
-        "status": "success",
-        "code": 200,
         "data": {
-            "thermostat": {
-                "id": 1,
-                "household_token": "pypNs7Zxf1onDDDzVmQf",
-                "address": "Europa-Allee 50; 60327 Frankfurt am Main, Germany"
+            "id": "6",
+            "type": "reading",
+            "attributes": {
+                "number": 1,
+                "token": "1aceb8075d4e84f9de37",
+                "temperature": 9,
+                "humidity": 10,
+                "battery_charge": 30,
+                "thermostat_id": 1
+            },
+            "relationships": {
+                "thermostat": {
+                    "data": {
+                        "id": "1",
+                        "type": "thermostat"
+                    }
+                }
             }
         },
-        "message": "Success"
+        "included": [
+            {
+                "id": "1",
+                "type": "thermostat",
+                "attributes": {
+                    "household_token": "pypNs7Zxf1onDDDzVmQf",
+                    "address": "Europa-Allee 50; 60327 Frankfurt am Main, Germany"
+                }
+            }
+        ]
     }
   ```
-  
+
 #### GET /statistics/pypNs7Zxf1onDDDzVmQf
   ##### Request
   ```sh
@@ -136,32 +157,61 @@ bundle exec rspec spec
   ##### Response
   ```sh
     {
-        "status": "success",
-        "code": 200,
         "data": {
-            "statistics": {
-                "temperature": {
-                    "min": 9,
-                    "avg": 9.67,
-                    "max": 10
+            "id": null,
+            "type": "statistics",
+            "attributes": {
+                "values": {
+                    "temperature": {
+                        "min": 9,
+                        "avg": 9,
+                        "max": 9
+                    },
+                    "humidity": {
+                        "min": 10,
+                        "avg": 10,
+                        "max": 10
+                    },
+                    "battery_charge": {
+                        "min": 30,
+                        "avg": 30,
+                        "max": 30
+                    }
                 },
-                "humidity": {
-                    "min": 10,
-                    "avg": 10,
-                    "max": 10
-                },
-                "battery_charge": {
-                    "min": 30,
-                    "avg": 30,
-                    "max": 30
+                "thermostat": {
+                    "id": 1,
+                    "household_token": "pypNs7Zxf1onDDDzVmQf",
+                    "address": "Europa-Allee 50; 60327 Frankfurt am Main, Germany"
                 }
-            },
-            "thermostat": {
-                "id": 1,
-                "household_token": "pypNs7Zxf1onDDDzVmQf",
-                "address": "Europa-Allee 50; 60327 Frankfurt am Main, Germany"
             }
-        },
-        "message": "Success"
+        }
+    }
+  ```
+
+#### Error Response format
+  ##### Response
+  ```sh
+    {
+        "data": {
+            "id": null,
+            "type": "error",
+            "attributes": {
+                "code": <Error code>,
+                "message": <Error Message>
+            }
+        }
+    }
+  ```
+  ##### Example
+  ```sh
+    {
+        "data": {
+            "id": null,
+            "type": "error",
+            "attributes": {
+                "code": 404,
+                "message": "Object Not Found"
+            }
+        }
     }
   ```
